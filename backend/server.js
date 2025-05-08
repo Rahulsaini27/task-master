@@ -9,7 +9,7 @@ connectDB();
 const app = express();
 app.use(
     cors({
-      origin: 'https://task-manager-frontend-pi-self.vercel.app',
+      origin: 'https://task-masterfront.vercel.app',
       methods: ['GET','POST','PUT','PATCH','DELETE'],
       credentials: true
     })
