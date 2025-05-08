@@ -44,7 +44,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://task-manager-backend-ashen-nu.vercel.app',
+        target: 'https://task-master-backend-sand.vercel.app',
         changeOrigin: true,
         secure: true,
         rewrite: (path) => path.replace(/^\/api/, '/api'),
