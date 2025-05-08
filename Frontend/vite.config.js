@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
@@ -34,12 +34,11 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Make sure to specify a destination for the sw.js
-        swDest: 'dev-dist/sw.js', // Ensure this path is correct and matches your build folder
+        swDest: 'dist/sw.js', // Must match build output folder
       },
     }),
   ],
-  base: '/', 
+  base: '/',
   server: {
     port: 5173,
     proxy: {
@@ -52,7 +51,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: 'dev-dist', // Ensure the output directory is correct
+    outDir: 'dist', // Changed from 'dev-dist' to 'dist' for Vercel
   },
   resolve: {
     alias: {
