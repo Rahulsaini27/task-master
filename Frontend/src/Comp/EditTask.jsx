@@ -8,7 +8,7 @@ import { Calendar, Clipboard, Users, AlertTriangle, CheckCircle, Edit, ArrowLeft
 function EditTask() {
     const { taskId } = useParams();
     const navigate = useNavigate();
-    const { user ,API_BASE_URL } = useContext(AppContext);
+    const { user, API_BASE_URL } = useContext(AppContext);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [originalData, setOriginalData] = useState(null);
@@ -76,7 +76,7 @@ function EditTask() {
                 });
                 setIsLoading(false);  // End loading state on error
             });
-    }, [taskId]);  // Dependency on taskId, re-fetch when taskId changes
+    }, [taskId, API_BASE_URL]);  // Dependency on taskId, re-fetch when taskId changes
     
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -147,9 +147,10 @@ function EditTask() {
         setIsSubmitting(true);
 
         axios
-            .put(`http://localhost:5000/api/task/update/${taskId}`, formData, {
+            .put(`${API_BASE_URL}/api/task/update/${taskId}`, formData, {
                 headers: {
                     'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
             })
             .then((response) => {
@@ -220,30 +221,30 @@ function EditTask() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6">
             <button 
                 onClick={goBack}
-                className="mb-6 inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors"
+                className="mb-4 sm:mb-6 inline-flex items-center px-3 py-1.5 text-sm font-medium text-blue-700 hover:text-blue-900 transition-colors"
             >
                 <ArrowLeft size={16} className="mr-1" />
                 Back to Tasks
             </button>
             
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-t-lg p-6">
-                <h2 className="text-3xl font-bold text-white flex items-center">
-                    <Edit className="mr-3" size={28} />
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-700 rounded-t-lg p-4 sm:p-6">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center">
+                    <Edit className="mr-2 sm:mr-3" size={24} />
                     Edit Task
                 </h2>
-                <p className="text-indigo-100 mt-2">
-                    Task ID: {taskId}
-                    {hasChanges && <span className="ml-3 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Unsaved Changes</span>}
+                <p className="text-indigo-100 mt-2 text-sm sm:text-base flex flex-wrap items-center">
+                    <span>Task ID: {taskId}</span>
+                    {hasChanges && <span className="ml-3 bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full mt-1 sm:mt-0">Unsaved Changes</span>}
                 </p>
             </div>
             
-            <div className="bg-white rounded-b-lg shadow-xl p-8 border border-t-0 border-gray-200">
-                <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="bg-white rounded-b-lg shadow-xl p-4 sm:p-6 md:p-8 border border-t-0 border-gray-200">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                     {/* Title Section */}
-                    <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-indigo-500">
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border-l-4 border-indigo-500">
                         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                             Task Title <span className="text-red-500">*</span>
                         </label>
@@ -254,7 +255,7 @@ function EditTask() {
                             value={formData.title}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                             placeholder="Enter task title"
                         />
                     </div>
@@ -273,13 +274,13 @@ function EditTask() {
                             value={formData.description}
                             onChange={handleChange}
                             rows={4}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                            className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                             placeholder="Task description"
                         />
                     </div>
 
                     {/* Due Date and Assigned To */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                             <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
                                 <div className="flex items-center">
@@ -293,7 +294,7 @@ function EditTask() {
                                 name="dueDate"
                                 value={formData.dueDate}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                             />
                         </div>
 
@@ -309,7 +310,7 @@ function EditTask() {
                                 name="assignedTo"
                                 value={formData.assignedTo}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
                             >
                                 <option value="">Select a team member</option>
                                 {Array.isArray(user) &&
@@ -334,7 +335,7 @@ function EditTask() {
                     </div>
 
                     {/* Priority and Status */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <div>
                             <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
                                 <div className="flex items-center">
@@ -348,7 +349,7 @@ function EditTask() {
                                     name="priority"
                                     value={formData.priority}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-all"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-all"
                                 >
                                     <option value="low">Low</option>
                                     <option value="medium">Medium</option>
@@ -373,7 +374,7 @@ function EditTask() {
                                     name="status"
                                     value={formData.status}
                                     onChange={handleChange}
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-all"
+                                    className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 appearance-none transition-all"
                                 >
                                     <option value="pending">Pending</option>
                                     <option value="in-progress">In Progress</option>
@@ -387,25 +388,26 @@ function EditTask() {
                     </div>
 
                     {/* Task Metadata */}
-                    <div className="bg-gray-50 p-4 rounded-lg mt-6 border border-gray-200">
-                        <div className="text-sm text-gray-500">
+                    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg mt-4 sm:mt-6 border border-gray-200">
+                        <div className="text-xs sm:text-sm text-gray-500">
                             <p className="flex items-center mb-1">
-                                <span className="font-medium mr-2">Task ID:</span> {taskId}
+                                <span className="font-medium mr-2">Task ID:</span> 
+                                <span className="truncate">{taskId}</span>
                             </p>
                             {originalData && originalData.createdAt && (
                                 <p className="flex items-center">
                                     <span className="font-medium mr-2">Created:</span>
-                                    {new Date(originalData.createdAt).toLocaleString()}
+                                    <span className="truncate">{new Date(originalData.createdAt).toLocaleString()}</span>
                                 </p>
                             )}
                         </div>
                     </div>
 
                     {/* Buttons */}
-                    <div className="flex justify-end pt-6 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row sm:justify-end pt-4 sm:pt-6 border-t border-gray-200 space-y-3 sm:space-y-0">
                         <button
                             type="button"
-                            className={`mr-4 px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md ${
+                            className={`w-full sm:w-auto mb-2 sm:mb-0 sm:mr-4 px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md ${
                                 hasChanges ? 'hover:bg-gray-50' : 'opacity-50 cursor-not-allowed'
                             } focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all duration-200`}
                             onClick={resetForm}
@@ -416,14 +418,14 @@ function EditTask() {
                         <button
                             type="submit"
                             disabled={isSubmitting || !hasChanges}
-                            className={`px-5 py-2.5 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md transition-all duration-200 ${
+                            className={`w-full sm:w-auto px-4 sm:px-5 py-2 sm:py-2.5 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 shadow-md transition-all duration-200 ${
                                 isSubmitting || !hasChanges
                                     ? 'bg-indigo-400 cursor-not-allowed' 
                                     : 'bg-indigo-600 hover:bg-indigo-700'
                             }`}
                         >
                             {isSubmitting ? (
-                                <div className="flex items-center">
+                                <div className="flex items-center justify-center">
                                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -431,7 +433,7 @@ function EditTask() {
                                     Saving...
                                 </div>
                             ) : (
-                                <div className="flex items-center">
+                                <div className="flex items-center justify-center">
                                     <span className="mr-1">Save Changes</span>
                                     <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>

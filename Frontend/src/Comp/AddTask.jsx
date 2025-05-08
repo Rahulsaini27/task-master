@@ -6,10 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Clock, Clipboard, Users, AlertTriangle, CheckCircle } from 'lucide-react';
 
 export default function TaskForm() {
-  const { user ,API_BASE_URL } = useContext(AppContext);
+  const { user, API_BASE_URL } = useContext(AppContext);
   const userId = localStorage.getItem('userId') || '';
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');  // Retrieve token from localStorage
+  const token = localStorage.getItem('token');
 
   const initialFormState = {
     title: '',
@@ -81,10 +81,11 @@ export default function TaskForm() {
         formData, 
         {
           headers: {
-            'Authorization': `Bearer ${token}`,  // Attach token in Authorization header
+            'Authorization': `Bearer ${token}`,
           }
         }
-      );      console.log('Form submitted:', response.data);
+      );
+      console.log('Form submitted:', response.data);
 
       Swal.fire({
         icon: 'success',
@@ -120,19 +121,21 @@ export default function TaskForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-lg p-6">
-        <h2 className="text-3xl font-bold text-white flex items-center">
-          <Clipboard className="mr-3" size={28} />
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Header Section - Responsive adjustments */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-lg p-4 sm:p-6">
+        <h2 className="text-2xl sm:text-3xl font-bold text-white flex items-center flex-wrap">
+          <Clipboard className="mr-2 sm:mr-3" size={24} />
           Create New Task
         </h2>
-        <p className="text-blue-100 mt-2">Fill in the details below to create a new task assignment</p>
+        <p className="text-blue-100 mt-2 text-sm sm:text-base">Fill in the details below to create a new task assignment</p>
       </div>
 
-      <div className="bg-white rounded-b-lg shadow-xl p-8 border border-t-0 border-gray-200">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Form Section - Responsive adjustments */}
+      <div className="bg-white rounded-b-lg shadow-xl p-4 sm:p-6 md:p-8 border border-t-0 border-gray-200">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Title Section */}
-          <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+          <div className="bg-gray-50 p-3 sm:p-4 rounded-lg border-l-4 border-blue-500">
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
               Task Title <span className="text-red-500">*</span>
             </label>
@@ -143,7 +146,7 @@ export default function TaskForm() {
               value={formData.title}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="Enter a descriptive task title"
             />
           </div>
@@ -159,17 +162,18 @@ export default function TaskForm() {
               value={formData.description}
               onChange={handleChange}
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               placeholder="Provide detailed information about this task..."
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Form Fields - Mobile: stack vertically, Desktop: 2 columns */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Due Date */}
             <div className="relative">
               <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
                 <div className="flex items-center">
-                  <Calendar className="mr-2" size={18} />
+                  <Calendar className="mr-2" size={16} />
                   Due Date
                 </div>
               </label>
@@ -179,7 +183,7 @@ export default function TaskForm() {
                 name="dueDate"
                 value={formData.dueDate}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               />
             </div>
 
@@ -187,7 +191,7 @@ export default function TaskForm() {
             <div>
               <label htmlFor="assignedTo" className="block text-sm font-medium text-gray-700 mb-1">
                 <div className="flex items-center">
-                  <Users className="mr-2" size={18} />
+                  <Users className="mr-2" size={16} />
                   Assigned To
                 </div>
               </label>
@@ -196,7 +200,7 @@ export default function TaskForm() {
                 name="assignedTo"
                 value={formData.assignedTo}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               >
                 <option value="">Select a team member</option>
                 {Array.isArray(user) &&
@@ -220,12 +224,12 @@ export default function TaskForm() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Priority */}
             <div>
               <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
                 <div className="flex items-center">
-                  <AlertTriangle className="mr-2" size={18} />
+                  <AlertTriangle className="mr-2" size={16} />
                   Priority
                 </div>
               </label>
@@ -235,7 +239,7 @@ export default function TaskForm() {
                   name="priority"
                   value={formData.priority}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-all"
+                  className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none transition-all pr-10"
                 >
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
@@ -251,7 +255,7 @@ export default function TaskForm() {
             <div>
               <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
                 <div className="flex items-center">
-                  <CheckCircle className="mr-2" size={18} />
+                  <CheckCircle className="mr-2" size={16} />
                   Status
                 </div>
               </label>
@@ -260,7 +264,7 @@ export default function TaskForm() {
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
               >
                 <option value="pending">Pending</option>
                 <option value="in-progress">In Progress</option>
@@ -269,11 +273,11 @@ export default function TaskForm() {
             </div>
           </div>
 
-          {/* Form Actions */}
-          <div className="flex justify-end pt-6 border-t border-gray-200">
+          {/* Form Actions - Stack buttons vertically on mobile, horizontally on desktop */}
+          <div className="flex flex-col sm:flex-row sm:justify-end pt-4 sm:pt-6 border-t border-gray-200 space-y-3 sm:space-y-0">
             <button
               type="button"
-              className="mr-4 px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all duration-200"
+              className="w-full sm:w-auto mb-2 sm:mb-0 sm:mr-4 px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 shadow-sm transition-all duration-200"
               onClick={resetForm}
             >
               Reset Form
@@ -281,13 +285,13 @@ export default function TaskForm() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`px-5 py-2.5 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-200 ${isSubmitting
-                  ? 'bg-blue-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700'
-                }`}
+              className={`w-full sm:w-auto px-4 py-2 sm:px-5 sm:py-2.5 text-sm font-medium text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md transition-all duration-200 ${isSubmitting
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
+              }`}
             >
               {isSubmitting ? (
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
@@ -295,7 +299,7 @@ export default function TaskForm() {
                   Creating Task...
                 </div>
               ) : (
-                <div className="flex items-center">
+                <div className="flex items-center justify-center">
                   <span className="mr-1">Create Task</span>
                   <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>

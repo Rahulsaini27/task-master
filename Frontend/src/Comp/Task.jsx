@@ -1,11 +1,8 @@
-
-
-
 import React, { useContext, useEffect, useState } from 'react';
 import {
   Trash2, Edit, Check, RefreshCw, AlertCircle, Clock,
   ChevronDown, Calendar, Target, CheckCircle2, Loader2,
-  Filter, SortDesc, User, Paperclip,
+  Filter, SortDesc, User, Paperclip, Menu, X
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
@@ -19,6 +16,7 @@ const Task = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [isStatusMenuOpen, setIsStatusMenuOpen] = useState(null);
+  const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
   // Add states for tracking operations in progress
   const [deletingTasks, setDeletingTasks] = useState([]);
   const [updatingTasks, setUpdatingTasks] = useState([]);
@@ -28,6 +26,16 @@ const Task = () => {
 
   useEffect(() => {
     fetchTasks();
+    
+    // Close mobile menu on screen resize
+    const handleResize = () => {
+      if (window.innerWidth > 768 && mobileControlsOpen) {
+        setMobileControlsOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const fetchTasks = async () => {
@@ -68,15 +76,15 @@ const Task = () => {
         try {
           // Add taskId to deleting array
           setDeletingTasks(prev => [...prev, taskId]);
-
+          
+          const token = localStorage.getItem('token');
           await fetch(`${API_BASE_URL}/api/task/delete/${taskId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`,  // Attach token in Authorization header
             },
-        })
+          });
         
-
           setTasks(tasks.filter(task => task._id !== taskId));
           Swal.fire(
             'Deleted!',
@@ -102,7 +110,8 @@ const Task = () => {
     try {
       // Add taskId to updating array
       setUpdatingTasks(prev => [...prev, taskId]);
-
+      
+      const token = localStorage.getItem('token');
       // In real implementation:
       await fetch(`${API_BASE_URL}/api/task/upt-status/${taskId}`, {
         method: 'PATCH',
@@ -195,19 +204,19 @@ const Task = () => {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center">
-          <Loader2 size={48} className="animate-spin text-blue-600 mb-3" />
-          <p className="text-gray-600 font-medium">Loading tasks...</p>
-        </div>
-      </div>
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+                      <div className="text-center">
+                          <Loader2 className="h-12 w-12 animate-spin text-indigo-600 mx-auto" />
+                          <p className="mt-4 text-gray-600">Loading </p>
+                      </div>
+                  </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-8 flex justify-center">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg max-w-md w-full shadow-sm">
+      <div className="p-4 md:p-8 flex justify-center">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 md:px-6 py-4 rounded-lg max-w-md w-full shadow-sm">
           <div className="flex items-center mb-3">
             <AlertCircle size={20} className="mr-2" />
             <h3 className="font-semibold">Error Loading Tasks</h3>
@@ -223,114 +232,167 @@ const Task = () => {
     );
   }
 
+  const FilterControls = () => (
+    <>
+      {/* Filter dropdown */}
+      <div className="relative">
+        <button
+          onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+          className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm font-medium transition-colors"
+        >
+          <Filter size={16} className="mr-2" />
+          Filter: {filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
+          <ChevronDown size={14} className="ml-2" />
+        </button>
+
+        {isFilterMenuOpen && (
+          <div className="absolute z-10 mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-1 w-40">
+            <button
+              onClick={() => {
+                setFilterStatus('all');
+                setIsFilterMenuOpen(false);
+                setMobileControlsOpen(false);
+              }}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              All
+            </button>
+            <button
+              onClick={() => {
+                setFilterStatus('pending');
+                setIsFilterMenuOpen(false);
+                setMobileControlsOpen(false);
+              }}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              Pending
+            </button>
+            <button
+              onClick={() => {
+                setFilterStatus('completed');
+                setIsFilterMenuOpen(false);
+                setMobileControlsOpen(false);
+              }}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              Completed
+            </button>
+            <button
+              onClick={() => {
+                setFilterStatus('overdue');
+                setIsFilterMenuOpen(false);
+                setMobileControlsOpen(false);
+              }}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+            >
+              Overdue
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Sort options */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-gray-500">Sort by:</span>
+        <select
+          value={sortBy}
+          onChange={(e) => {
+            setSortBy(e.target.value);
+            setMobileControlsOpen(false);
+          }}
+          className="bg-gray-100 text-gray-800 text-sm rounded px-3 py-2 border-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="dueDate">Due Date</option>
+          <option value="priority">Priority</option>
+        </select>
+      </div>
+    </>
+  );
+
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
-      <div className='flex justify-between items-center mb-6'>
+    <div className="p-3 sm:p-4 md:p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
+      <div className='flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 md:mb-6 gap-3'>
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Task Manager</h1>
-          <p className="text-gray-600">Manage and track your team's tasks and deadlines</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-1 sm:mb-2">Task Manager</h1>
+          <p className="text-sm sm:text-base text-gray-600">Manage and track your team's tasks and deadlines</p>
         </div>
         <Link
           to="/layout/task/add-task"
-          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+          className="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm sm:text-base"
         >
           Add Task
         </Link>
       </div>
 
       {/* Controls bar */}
-      <div className="bg-white rounded-lg shadow-sm p-4 mb-6 flex flex-wrap justify-between items-center">
-        <div className="flex flex-wrap items-center gap-3 mb-3 md:mb-0">
-          {/* Filter dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-              className="flex items-center bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded text-sm font-medium transition-colors"
-            >
-              <Filter size={16} className="mr-2" />
-              Filter: {filterStatus.charAt(0).toUpperCase() + filterStatus.slice(1)}
-              <ChevronDown size={14} className="ml-2" />
-            </button>
-
-            {isFilterMenuOpen && (
-              <div className="absolute z-10 mt-1 bg-white rounded-md shadow-lg border border-gray-200 py-1 w-40">
-                <button
-                  onClick={() => {
-                    setFilterStatus('all');
-                    setIsFilterMenuOpen(false);
-                  }}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                >
-                  All
-                </button>
-                <button
-                  onClick={() => {
-                    setFilterStatus('pending');
-                    setIsFilterMenuOpen(false);
-                  }}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                >
-                  Pending
-                </button>
-                <button
-                  onClick={() => {
-                    setFilterStatus('completed');
-                    setIsFilterMenuOpen(false);
-                  }}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                >
-                  Completed
-                </button>
-                <button
-                  onClick={() => {
-                    setFilterStatus('overdue');
-                    setIsFilterMenuOpen(false);
-                  }}
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
-                >
-                  Overdue
-                </button>
-              </div>
+      <div className="bg-white rounded-lg shadow-sm p-3 md:p-4 mb-4 md:mb-6">
+        {/* Mobile controls toggle */}
+        <div className="md:hidden flex justify-between items-center mb-3">
+          <button
+            onClick={() => setMobileControlsOpen(!mobileControlsOpen)}
+            className="flex items-center bg-blue-100 hover:bg-blue-200 px-3 py-2 rounded text-sm font-medium transition-colors text-blue-700"
+          >
+            {mobileControlsOpen ? <X size={16} className="mr-2" /> : <Menu size={16} className="mr-2" />}
+            {mobileControlsOpen ? 'Close Filters' : 'Show Filters'}
+          </button>
+          
+          <button
+            onClick={fetchTasks}
+            disabled={refreshing}
+            className={`${refreshing
+              ? 'bg-blue-100 text-blue-400 cursor-not-allowed'
+              : 'bg-blue-50 hover:bg-blue-100 text-blue-600 cursor-pointer'
+              } px-3 py-2 rounded text-sm font-medium flex items-center transition-colors`}
+          >
+            {refreshing ? (
+              <>
+                <Loader2 size={16} className="mr-1" /> Refreshing...
+              </>
+            ) : (
+              <>
+                <RefreshCw size={16} className="mr-1" /> Refresh
+              </>
             )}
-          </div>
-
-          {/* Sort options */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Sort by:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-gray-100 text-gray-800 text-sm rounded px-3 py-2 border-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="dueDate">Due Date</option>
-              <option value="priority">Priority</option>
-            </select>
-          </div>
+          </button>
         </div>
+        
+        {/* Mobile controls dropdown */}
+        {mobileControlsOpen && (
+          <div className="md:hidden flex flex-col gap-3 pb-3 border-b border-gray-200">
+            <FilterControls />
+          </div>
+        )}
+        
+        {/* Desktop controls */}
+        <div className="hidden md:flex flex-wrap justify-between items-center">
+          <div className="flex flex-wrap items-center gap-3">
+            <FilterControls />
+          </div>
 
-        <button
-          onClick={fetchTasks}
-          disabled={refreshing}
-          className={`${refreshing
-            ? 'bg-blue-100 text-blue-400 cursor-not-allowed'
-            : 'bg-blue-50 hover:bg-blue-100 text-blue-600 cursor-pointer'
-            } px-4 py-2 rounded text-sm font-medium flex items-center transition-colors`}
-        >
-          {refreshing ? (
-            <>
-              <Loader2 size={16} className="mr-2 animate-spin" /> Refreshing...
-            </>
-          ) : (
-            <>
-              <RefreshCw size={16} className="mr-2" /> Refresh
-            </>
-          )}
-        </button>
+          <button
+            onClick={fetchTasks}
+            disabled={refreshing}
+            className={`${refreshing
+              ? 'bg-blue-100 text-blue-400 cursor-not-allowed'
+              : 'bg-blue-50 hover:bg-blue-100 text-blue-600 cursor-pointer'
+              } px-4 py-2 rounded text-sm font-medium flex items-center transition-colors`}
+          >
+            {refreshing ? (
+              <>
+                <Loader2 size={16} className="mr-2" /> Refreshing...
+              </>
+            ) : (
+              <>
+                <RefreshCw size={16} className="mr-2" /> Refresh
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Task list */}
       {sortedTasks.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+        <div className="bg-white rounded-lg shadow-sm p-6 text-center">
           <div className="flex justify-center mb-4">
             <div className="bg-gray-100 p-4 rounded-full">
               <Paperclip size={24} className="text-gray-400" />
@@ -344,123 +406,121 @@ const Task = () => {
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           {sortedTasks.map(task => (
             <div
               key={task._id}
-              className="bg-white rounded-lg shadow-sm p-5 transition-all hover:shadow"
+              className="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-5 transition-all hover:shadow"
             >
-              {/* Task display */}
-              <div className="bg-white shadow rounded-xl p-4 hover:shadow-md transition-shadow mb-4">
-                {/* Header: Title & Status */}
-                <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-lg font-semibold text-gray-900">{task.title}</h3>
-                  {getStatusBadge(task.status)}
+              {/* Task Header: Title & Status */}
+              <div className="flex justify-between items-start mb-2 sm:mb-3 flex-wrap gap-2">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900">{task.title}</h3>
+                {getStatusBadge(task.status)}
+              </div>
+
+              {/* Description */}
+              <p className="text-sm sm:text-base text-gray-700 mb-3 sm:mb-4">{task.description}</p>
+
+              {/* Task Info Section */}
+              <div className="space-y-3 sm:space-y-0 sm:flex sm:flex-wrap sm:justify-between sm:items-center gap-2 sm:gap-4">
+                {/* Info grid for mobile, flex for desktop */}
+                <div className="grid grid-cols-2 gap-x-2 gap-y-3 text-xs sm:text-sm text-gray-600 sm:flex sm:flex-wrap sm:items-center sm:gap-4">
+                  {/* Priority */}
+                  <div className="flex items-center">
+                    <span className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full mr-1 sm:mr-2 ${getPriorityColor(task.priority)}`}></span>
+                    <span className="capitalize">{task.priority} Priority</span>
+                  </div>
+
+                  {/* Due Date */}
+                  <div className="flex items-center">
+                    <Calendar size={14} className="mr-1 sm:mr-2 text-blue-500" />
+                    {new Date(task.dueDate).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </div>
+
+                  {/* Created By */}
+                  <div className="flex items-center">
+                    <User size={14} className="mr-1 sm:mr-2 text-purple-500" />
+                    <span className="truncate">Given by {task.createdBy.username}</span>
+                  </div>
+
+                  {/* Assigned To */}
+                  <div className="flex items-center">
+                    <User size={14} className="mr-1 sm:mr-2 text-green-500" />
+                    <span className="truncate">Given to {task.assignedTo ? task.assignedTo.username : 'Unassigned'}</span>
+                  </div>
                 </div>
 
-                {/* Description */}
-                <p className="text-gray-700 mb-4">{task.description}</p>
-
-                {/* Task Info Section */}
-                <div className="flex flex-wrap justify-between items-center gap-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6 gap-3 text-sm text-gray-600">
-                    {/* Priority */}
-                    <div className="flex items-center">
-                      <span className={`w-3 h-3 rounded-full mr-2 ${getPriorityColor(task.priority)}`}></span>
-                      <span className="capitalize">{task.priority} Priority</span>
-                    </div>
-
-                    {/* Due Date */}
-                    <div className="flex items-center">
-                      <Calendar size={16} className="mr-2 text-blue-500" />
-                      {new Date(task.dueDate).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </div>
-
-                    {/* Created By */}
-                    <div className="flex items-center">
-                      <User size={16} className="mr-2 text-purple-500" />
-                      <span>Given by {task.createdBy.username}</span>
-                    </div>
-
-                    {/* Assigned To */}
-                    <div className="flex items-center">
-                      <User size={16} className="mr-2 text-green-500" />
-                      <span>Given to {task.assignedTo ? task.assignedTo.username : 'Unassigned'}</span>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex space-x-2">
-                    {/* Status Update Dropdown */}
-                    <div className="relative">
-                      <button
-                        onClick={() => setIsStatusMenuOpen(isStatusMenuOpen === task._id ? null : task._id)}
-                        className={`p-2 rounded-full ${updatingTasks.includes(task._id)
-                            ? 'bg-blue-50 text-blue-300 cursor-not-allowed'
-                            : 'bg-blue-100 text-blue-600 hover:bg-blue-200 cursor-pointer'
-                          } transition flex items-center`}
-                        title="Update status"
-                        disabled={updatingTasks.includes(task._id)}
-                      >
-                        {updatingTasks.includes(task._id) ? (
-                          <Loader2 size={18} className="animate-spin" />
-                        ) : (
-                          <RefreshCw size={18} />
-                        )}
-                      </button>
-
-                      {isStatusMenuOpen === task._id && !updatingTasks.includes(task._id) && (
-                        <div className="absolute right-0 z-10 mt-2 bg-white rounded-md shadow-lg border border-gray-200 py-1 w-32">
-                          <button
-                            onClick={() => handleStatusUpdate(task._id, 'pending')}
-                            className="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 w-full text-left"
-                          >
-                            Pending
-                          </button>
-                          <button
-                            onClick={() => handleStatusUpdate(task._id, 'completed')}
-                            className="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 w-full text-left"
-                          >
-                            Completed
-                          </button>
-                          <button
-                            onClick={() => handleStatusUpdate(task._id, 'overdue')}
-                            className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
-                          >
-                            Overdue
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
+                {/* Action Buttons */}
+                <div className="flex space-x-2 justify-end mt-3 sm:mt-0 sm:justify-start">
+                  {/* Status Update Dropdown */}
+                  <div className="relative">
                     <button
-                      onClick={() => handleEditClick(task._id)}
-                      className="p-2 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 transition"
-                      title="Edit task"
-                    >
-                      <Edit size={18} />
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(task._id)}
-                      disabled={deletingTasks.includes(task._id)}
-                      className={`p-2 rounded-full ${deletingTasks.includes(task._id)
-                          ? 'bg-red-50 text-red-300 cursor-not-allowed'
-                          : 'bg-red-100 text-red-600 hover:bg-red-200 cursor-pointer'
+                      onClick={() => setIsStatusMenuOpen(isStatusMenuOpen === task._id ? null : task._id)}
+                      className={`p-2 rounded-full ${updatingTasks.includes(task._id)
+                          ? 'bg-blue-50 text-blue-300 cursor-not-allowed'
+                          : 'bg-blue-100 text-blue-600 hover:bg-blue-200 cursor-pointer'
                         } transition flex items-center`}
-                      title="Delete task"
+                      title="Update status"
+                      disabled={updatingTasks.includes(task._id)}
                     >
-                      {deletingTasks.includes(task._id) ? (
-                        <Loader2 size={18} className="animate-spin" />
+                      {updatingTasks.includes(task._id) ? (
+                        <Loader2 size={16} className="animate-spin" />
                       ) : (
-                        <Trash2 size={18} />
+                        <RefreshCw size={16} />
                       )}
                     </button>
+
+                    {isStatusMenuOpen === task._id && !updatingTasks.includes(task._id) && (
+                      <div className="absolute right-0 z-10 mt-2 bg-white rounded-md shadow-lg border border-gray-200 py-1 w-32">
+                        <button
+                          onClick={() => handleStatusUpdate(task._id, 'pending')}
+                          className="block px-4 py-2 text-sm text-yellow-600 hover:bg-gray-100 w-full text-left"
+                        >
+                          Pending
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(task._id, 'completed')}
+                          className="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100 w-full text-left"
+                        >
+                          Completed
+                        </button>
+                        <button
+                          onClick={() => handleStatusUpdate(task._id, 'overdue')}
+                          className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 w-full text-left"
+                        >
+                          Overdue
+                        </button>
+                      </div>
+                    )}
                   </div>
+
+                  <button
+                    onClick={() => handleEditClick(task._id)}
+                    className="p-2 rounded-full bg-amber-100 text-amber-600 hover:bg-amber-200 transition"
+                    title="Edit task"
+                  >
+                    <Edit size={16} />
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(task._id)}
+                    disabled={deletingTasks.includes(task._id)}
+                    className={`p-2 rounded-full ${deletingTasks.includes(task._id)
+                        ? 'bg-red-50 text-red-300 cursor-not-allowed'
+                        : 'bg-red-100 text-red-600 hover:bg-red-200 cursor-pointer'
+                      } transition flex items-center`}
+                    title="Delete task"
+                  >
+                    {deletingTasks.includes(task._id) ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={16} />
+                    )}
+                  </button>
                 </div>
               </div>
             </div>

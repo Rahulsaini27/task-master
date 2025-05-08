@@ -75,19 +75,19 @@ const TaskCard = ({ task, index }) => {
                             '#22c55e'
             }}
         >
-            <div className="flex justify-between items-start mb-2">
-                <h3 className="font-medium text-gray-800">{task.title}</h3>
+            <div className="flex flex-wrap justify-between items-start mb-2 gap-2">
+                <h3 className="font-medium text-gray-800 break-words">{task.title}</h3>
                 <div className="flex space-x-2">
                     {task.status === 'completed' ? (
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded flex items-center">
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded flex items-center whitespace-nowrap">
                             <Check size={12} className="mr-1" /> Done
                         </span>
                     ) : task.status === 'in-progress' ? (
-                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center">
+                        <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded flex items-center whitespace-nowrap">
                             <Clock size={12} className="mr-1" /> In Progress
                         </span>
                     ) : (
-                        <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded flex items-center">
+                        <span className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded flex items-center whitespace-nowrap">
                             <List size={12} className="mr-1" /> Pending
                         </span>
                     )}
@@ -154,14 +154,30 @@ const ParallaxHero = () => {
             setMousePosition({ x, y });
         };
 
+        const handleTouchMove = (e) => {
+            if (!heroRef.current || !e.touches[0]) return;
+            const { clientX, clientY } = e.touches[0];
+            const { width, height, left, top } = heroRef.current.getBoundingClientRect();
+
+            const x = (clientX - left) / width - 0.5;
+            const y = (clientY - top) / height - 0.5;
+
+            setMousePosition({ x, y });
+        };
+
         window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+        window.addEventListener('touchmove', handleTouchMove);
+        
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('touchmove', handleTouchMove);
+        };
     }, []);
 
     return (
         <div
             ref={heroRef}
-            className="relative overflow-hidden bg-gradient-to-br from-purple-900 to-indigo-800 text-white py-20 px-6 md:px-10 rounded-3xl shadow-xl"
+            className="relative overflow-hidden bg-gradient-to-br from-purple-900 to-indigo-800 text-white py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-10 rounded-xl sm:rounded-2xl md:rounded-3xl shadow-xl"
         >
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden opacity-10">
@@ -190,10 +206,10 @@ const ParallaxHero = () => {
                         transform: `translateX(${mousePosition.x * -15}px) translateY(${mousePosition.y * -15}px)`
                     }}
                 >
-                    <h1 className="text-4xl md:text-6xl font-extrabold mb-4">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
                         Manage Tasks <span className="text-purple-300">Effortlessly</span>
                     </h1>
-                    <p className="text-xl md:text-2xl mb-8 max-w-xl text-purple-100">
+                    <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 max-w-xl text-purple-100">
                         Keep your projects on track with our intuitive task management system.
                     </p>
                 </div>
@@ -204,25 +220,27 @@ const ParallaxHero = () => {
                         transform: `translateX(${mousePosition.x * 10}px) translateY(${mousePosition.y * 10}px)`
                     }}
                 >
-                    <div className="mt-10 flex flex-wrap gap-4">
-                        <button className="bg-purple-500 hover:bg-purple-600 py-3 px-6 rounded-lg font-medium flex items-center transition-all duration-300 shadow-lg hover:shadow-xl">
-                            Get Started <ArrowRight size={18} className="ml-2" />
+                    <div className="mt-6 sm:mt-8 md:mt-10 flex flex-wrap gap-3 sm:gap-4">
+                        <button className="bg-purple-500 hover:bg-purple-600 py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-medium flex items-center transition-all duration-300 shadow-lg hover:shadow-xl text-sm sm:text-base">
+                            Get Started <ArrowRight size={16} className="ml-2" />
                         </button>
-                        <button className="bg-transparent border border-purple-400 hover:border-purple-300 py-3 px-6 rounded-lg font-medium flex items-center transition-all duration-300">
+                        <button className="bg-transparent border border-purple-400 hover:border-purple-300 py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-medium flex items-center transition-all duration-300 text-sm sm:text-base">
                             Learn More
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Floating elements */}
-            <FloatingElement delay={200} offset={15}>
-                <div className="absolute -right-16 lg:right-10 top-10 w-32 h-32 bg-purple-500 rounded-2xl opacity-20 transform rotate-12" />
-            </FloatingElement>
+            {/* Floating elements - hidden on smallest screens */}
+            <div className="hidden sm:block">
+                <FloatingElement delay={200} offset={15}>
+                    <div className="absolute -right-16 lg:right-10 top-10 w-24 sm:w-32 h-24 sm:h-32 bg-purple-500 rounded-2xl opacity-20 transform rotate-12" />
+                </FloatingElement>
 
-            <FloatingElement delay={100} offset={20}>
-                <div className="absolute -left-10 bottom-10 w-20 h-20 bg-indigo-400 rounded-full opacity-20" />
-            </FloatingElement>
+                <FloatingElement delay={100} offset={20}>
+                    <div className="absolute -left-10 bottom-10 w-16 sm:w-20 h-16 sm:h-20 bg-indigo-400 rounded-full opacity-20" />
+                </FloatingElement>
+            </div>
         </div>
     );
 };
@@ -277,36 +295,38 @@ const FeaturesSection = () => {
     }, []);
 
     return (
-        <div ref={featuresRef} className="py-16 px-6 md:px-10">
-            <h2 className="text-3xl font-bold text-center mb-12">Powerful Features</h2>
+        <div ref={featuresRef} className="py-10 sm:py-12 md:py-16 px-4 sm:px-6 md:px-10">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Powerful Features</h2>
 
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
                 {features.map((feature, index) => (
                     <div
                         key={index}
-                        className="feature-item bg-white p-6 rounded-xl shadow-md opacity-0 transform translate-y-10 transition-all duration-500"
+                        className="feature-item bg-white p-5 sm:p-6 rounded-xl shadow-md opacity-0 transform translate-y-10 transition-all duration-500"
                     >
                         <div className="mb-4 p-3 inline-block bg-gray-50 rounded-lg">{feature.icon}</div>
-                        <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                        <h3 className="text-lg sm:text-xl font-semibold mb-2">{feature.title}</h3>
                         <p className="text-gray-600">{feature.description}</p>
                     </div>
                 ))}
             </div>
 
             <style jsx>{`
-        .animate-in {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      `}</style>
+                .animate-in {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            `}</style>
         </div>
     );
 };
 
 const Header = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
     const headerRef = useRef(null);
     const { animate } = useGSAPLike();
+    const menuRef = useRef(null);
 
     useEffect(() => {
         const element = headerRef.current;
@@ -320,61 +340,95 @@ const Header = () => {
                 animate(element, { opacity: 1, y: 0 }, 0.5, 0);
             }, 100);
         }
+
+        // Handle scroll for sticky header
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Close mobile menu when clicking outside
+    useEffect(() => {
+        if (!isMenuOpen) return;
+
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isMenuOpen]);
 
     return (
         <header
             ref={headerRef}
-            className="bg-white shadow-sm py-4 px-6 md:px-10"
+            className={`bg-white py-3 sm:py-4 px-4 sm:px-6 md:px-10 sticky top-0 z-50 transition-shadow duration-300 ${
+                isScrolled ? 'shadow-md' : 'shadow-sm'
+            }`}
         >
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 <div className="flex items-center space-x-2">
-                    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-2 rounded-lg">
-                        <Check size={20} />
+                    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-1.5 sm:p-2 rounded-lg">
+                        <Check size={18} />
                     </div>
-                    <span className="text-xl font-bold text-gray-800">TaskMaster</span>
+                    <span className="text-lg sm:text-xl font-bold text-gray-800">TaskMaster</span>
                 </div>
 
                 {/* Desktop navigation */}
-                <nav className="hidden md:flex items-center space-x-8">
+                <nav className="hidden md:flex items-center space-x-6 lg:space-x-8">
                     <a href="#" className="text-gray-800 font-medium hover:text-purple-600 transition-colors">Features</a>
                     <a href="#" className="text-gray-800 font-medium hover:text-purple-600 transition-colors">Pricing</a>
                     <a href="#" className="text-gray-800 font-medium hover:text-purple-600 transition-colors">Resources</a>
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-5 rounded-lg transition-colors">
-                    <Link to="/login">Login</Link>
-
-
-                </button>
-            </nav>
-
-            {/* Mobile navigation */}
-            <div className="md:hidden">
-                <button
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    className="p-2 text-gray-600 focus:outline-none"
-                >
-                    {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-            </div>
-        </div>
-      
-      {/* Mobile menu */ }
-    {
-        isMenuOpen && (
-            <div className="md:hidden mt-4 bg-white rounded-lg shadow-lg p-4">
-                <nav className="flex flex-col space-y-4">
-                    <a href="#" className="text-gray-800 py-2 hover:text-purple-600 transition-colors">Features</a>
-                    <a href="#" className="text-gray-800 py-2 hover:text-purple-600 transition-colors">Pricing</a>
-                    <a href="#" className="text-gray-800 py-2 hover:text-purple-600 transition-colors">Resources</a>
-                    <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-5 rounded-lg transition-colors">
-                    <Link to="/login">Login</Link>
+                    <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg transition-colors">
+                        <Link to="/login" className="text-white">Login</Link>
                     </button>
                 </nav>
+
+                {/* Mobile navigation toggle */}
+                <div className="md:hidden">
+                    <button
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                        className="p-2 text-gray-600 focus:outline-none"
+                        aria-label="Toggle menu"
+                    >
+                        {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
             </div>
-        )
-    }
-    </header >
-  );
+      
+            {/* Mobile menu */}
+            {isMenuOpen && (
+                <div 
+                    ref={menuRef}
+                    className="md:hidden mt-4 bg-white rounded-lg shadow-lg p-4 absolute left-0 right-0 mx-4 animate-fadeIn"
+                >
+                    <nav className="flex flex-col space-y-4">
+                        <a href="#" className="text-gray-800 py-2 hover:text-purple-600 transition-colors">Features</a>
+                        <a href="#" className="text-gray-800 py-2 hover:text-purple-600 transition-colors">Pricing</a>
+                        <a href="#" className="text-gray-800 py-2 hover:text-purple-600 transition-colors">Resources</a>
+                        <button className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-5 rounded-lg transition-colors">
+                            <Link to="/login" className="text-white">Login</Link>
+                        </button>
+                    </nav>
+                </div>
+            )}
+            
+            <style jsx>{`
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(-10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fadeIn {
+                    animation: fadeIn 0.2s ease-out forwards;
+                }
+            `}</style>
+        </header>
+    );
 };
 
 // Main App Component
@@ -398,21 +452,21 @@ export default function TaskManagementHomepage() {
         <div ref={appRef} className="min-h-screen bg-gray-50">
             <Header />
 
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 md:pt-8 pb-12 sm:pb-16">
                 <ParallaxHero />
 
                 <FeaturesSection />
 
                 {/* Tasks preview section */}
-                <div className="mt-16 mb-12">
-                    <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-2xl font-bold text-gray-800">Your Tasks</h2>
-                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg flex items-center transition-colors">
-                            <Plus size={18} className="mr-1" /> New Task
+                <div className="mt-10 sm:mt-12 md:mt-16 mb-8 sm:mb-12">
+                    <div className="flex flex-wrap justify-between items-center mb-6 sm:mb-8 gap-4">
+                        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Your Tasks</h2>
+                        <button className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg flex items-center transition-colors text-sm sm:text-base">
+                            <Plus size={16} className="mr-1" /> New Task
                         </button>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {mockTasks.map((task, index) => (
                             <TaskCard key={task.id} task={task} index={index} />
                         ))}
@@ -426,56 +480,56 @@ export default function TaskManagementHomepage() {
                 </div>
 
                 {/* Call to action */}
-                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 md:p-12 text-white text-center shadow-xl">
-                    <h2 className="text-3xl font-bold mb-4">Ready to boost your productivity?</h2>
-                    <p className="text-lg mb-8 max-w-2xl mx-auto">Join thousands of teams already managing their work effectively with TaskMaster.</p>
-                    <div className="flex justify-center space-x-4">
-                        <button className="bg-white text-indigo-600 hover:bg-gray-100 font-medium py-3 px-6 rounded-lg transition-colors shadow-md">
+                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg sm:rounded-xl md:rounded-2xl p-6 sm:p-8 md:p-12 text-white text-center shadow-xl">
+                    <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Ready to boost your productivity?</h2>
+                    <p className="text-base sm:text-lg mb-6 sm:mb-8 max-w-2xl mx-auto">Join thousands of teams already managing their work effectively with TaskMaster.</p>
+                    <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+                        <button className="bg-white text-indigo-600 hover:bg-gray-100 font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors shadow-md text-sm sm:text-base">
                             Start Free Trial
                         </button>
-                        <button className="bg-transparent border border-white hover:bg-white/10 font-medium py-3 px-6 rounded-lg transition-colors">
+                        <button className="bg-transparent border border-white hover:bg-white/10 font-medium py-2 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors text-sm sm:text-base">
                             Watch Demo
                         </button>
                     </div>
                 </div>
             </main>
 
-            <footer className="bg-gray-800 text-white py-12 px-6">
-                <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+            <footer className="bg-gray-800 text-white py-8 sm:py-12 px-4 sm:px-6">
+                <div className="max-w-7xl mx-auto grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
                     <div>
-                        <h3 className="font-bold text-lg mb-4">Product</h3>
+                        <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">Product</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Features</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Pricing</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Integrations</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Features</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Pricing</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Integrations</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-4">Resources</h3>
+                        <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">Resources</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Documentation</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Tutorials</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Blog</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Documentation</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Tutorials</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Blog</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-4">Company</h3>
+                        <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">Company</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">About Us</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Careers</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Contact</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">About Us</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Careers</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Contact</a></li>
                         </ul>
                     </div>
                     <div>
-                        <h3 className="font-bold text-lg mb-4">Legal</h3>
+                        <h3 className="font-bold text-base sm:text-lg mb-3 sm:mb-4">Legal</h3>
                         <ul className="space-y-2">
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Terms of Service</a></li>
-                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Security</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Privacy Policy</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Terms of Service</a></li>
+                            <li><a href="#" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Security</a></li>
                         </ul>
                     </div>
                 </div>
-                <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
+                <div className="max-w-7xl mx-auto mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
                     &copy; {new Date().getFullYear()} TaskMaster. All rights reserved.
                 </div>
             </footer>

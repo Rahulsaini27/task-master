@@ -7,11 +7,13 @@ dotenv.config();
 connectDB();
 
 const app = express();
-app.use(cors({
-    origin: "*",
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    credentials: true
-}));
+app.use(
+    cors({
+      origin: 'https://task-manager-frontend-pi-self.vercel.app',
+      methods: ['GET','POST','PUT','PATCH','DELETE'],
+      credentials: true
+    })
+  );
 app.use(express.json());
 
 app.get("/", async (req, res) => {
