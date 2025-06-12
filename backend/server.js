@@ -9,7 +9,9 @@ connectDB();
 const app = express();
 app.use(
     cors({
-      origin: 'https://task-masterfront.vercel.app',
+              origin: '*',
+
+      // origin: 'https://task-masterfront.vercel.app',
       methods: ['GET','POST','PUT','PATCH','DELETE'],
       credentials: true
     })
