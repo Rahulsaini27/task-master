@@ -114,8 +114,18 @@ function User() {
   };
   
 
-  // Set up user editing
+  // Set up user editing - modified to prevent admin editing
   const handleEditClick = (user) => {
+    if (user.role === 'admin') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Action Not Allowed',
+        text: 'Admin users cannot be edited for security reasons.',
+        confirmButtonColor: '#3b82f6'
+      });
+      return;
+    }
+
     setCurrentUser(user);
     setFormData({
       username: user.username,
@@ -176,8 +186,18 @@ function User() {
     }
   };
 
-  // Delete user
-  const handleDeleteUser = async (userId, username) => {
+  // Delete user - modified to prevent admin deletion
+  const handleDeleteUser = async (userId, username, userRole) => {
+    if (userRole === 'admin') {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Action Not Allowed',
+        text: 'Admin users cannot be deleted for security reasons.',
+        confirmButtonColor: '#3b82f6'
+      });
+      return;
+    }
+
     // Ask for confirmation with SweetAlert
     Swal.fire({
       title: 'Are you sure?',
@@ -256,6 +276,51 @@ function User() {
           </span>
         );
     }
+  };
+
+  // Render action buttons based on user role
+  const renderActionButtons = (user) => {
+    const isAdmin = user.role === 'admin';
+    
+    if (isAdmin) {
+      return (
+        <>
+          <button
+            disabled
+            className="text-gray-300 bg-gray-100 p-2 rounded-full mr-2 cursor-not-allowed opacity-50"
+            title="Admin users cannot be edited"
+          >
+            <X className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+          <button
+            disabled
+            className="text-gray-300 bg-gray-100 p-2 rounded-full cursor-not-allowed opacity-50"
+            title="Admin users cannot be deleted"
+          >
+            <X className="w-4 h-4 md:w-5 md:h-5" />
+          </button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <button
+          onClick={() => handleEditClick(user)}
+          className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors"
+          title="Edit user"
+        >
+          <Edit className="w-4 h-4 md:w-5 md:h-5" />
+        </button>
+        <button
+          onClick={() => handleDeleteUser(user.id, user.username, user.role)}
+          className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
+          title="Delete user"
+        >
+          <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
+        </button>
+      </>
+    );
   };
 
   return (
@@ -350,20 +415,7 @@ function User() {
                         {renderRoleBadge(user.role)}
                       </td>
                       <td className="px-4 md:px-6 py-3 md:py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => handleEditClick(user)}
-                          className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors"
-                          title="Edit user"
-                        >
-                          <Edit className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteUser(user.id, user.username)}
-                          className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
-                          title="Delete user"
-                        >
-                          <Trash2 className="w-4 h-4 md:w-5 md:h-5" />
-                        </button>
+                        {renderActionButtons(user)}
                       </td>
                     </tr>
                   ))
@@ -412,20 +464,7 @@ function User() {
                       </div>
                     </div>
                     <div className="flex justify-end mt-3">
-                      <button
-                        onClick={() => handleEditClick(user)}
-                        className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-full mr-2 transition-colors"
-                        title="Edit user"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteUser(user.id, user.username)}
-                        className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-full transition-colors"
-                        title="Delete user"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                      {renderActionButtons(user)}
                     </div>
                   </div>
                 ))}
