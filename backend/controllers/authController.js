@@ -118,8 +118,9 @@ exports.deleteUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
-    // Changed from user.remove() which is deprecated
+     if (user.role === 'admin') {
+      return res.status(403).json({ message: 'Admin users cannot be deleted' });
+    }
     await User.deleteOne({ _id: req.params.id });
     res.status(200).json({ message: 'User removed successfully' });
   } catch (error) {
