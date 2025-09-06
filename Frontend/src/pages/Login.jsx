@@ -242,6 +242,11 @@ export default function LoginPage() {
             <div className="mt-8">
               <div className="mt-6">
                 <LoginForm />
+                <div className="mt-6 text-center text-sm text-gray-500">
+                <p>
+                  <span className="font-semibold">Admin:</span> superadmin@gmail.com | <span className="font-semibold">Password:</span> superadmin@gmail.com
+                </p>
+              </div>
               </div>
 
               <div className="mt-8">
