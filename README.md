@@ -4,7 +4,7 @@ A full-stack task management application built with Node.js, Express, MongoDB, a
 
 ## 🚀 Live Demo
 
-Access the live application: [Your Live Application Link](https://task-masterfront.vercel.app/)
+Access the live application: [Task Master](https://task-masterfront.vercel.app/)
 
 ## 📸 Screenshots
 
