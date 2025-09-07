@@ -419,7 +419,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Rahul Saini**
 - GitHub: [@Rahulsaini27](https://github.com/Rahulsaini27)
-- LinkedIn: [Your LinkedIn Profile](https://www.linkedin.com/in/rahul-saini-3994a2241/)
+- LinkedIn: [Rahul Saini](https://www.linkedin.com/in/rahul-saini-3994a2241/)
 - Email: rahulsaini42854@gmail.com
 
 ## 🙏 Acknowledgments
